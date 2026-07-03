@@ -1,21 +1,15 @@
+import { Link } from "react-router-dom";
+
 function Navbar() {
+  return (
+    <nav className="navbar">
+      <Link to="/">Home</Link>
 
-    return (
+      <Link to="/listings">Listings</Link>
 
-        <nav className="navbar">
-
-            <a href="/">Home</a>
-
-            <a href="/">Listings</a>
-
-            <a href="/">Details</a>
-
-            <a href="/">Cart</a>
-
-        </nav>
-
-    );
-
+      <Link to="/cart">Cart</Link>
+    </nav>
+  );
 }
 
 export default Navbar;

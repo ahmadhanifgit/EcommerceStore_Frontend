@@ -1,0 +1,150 @@
+.product-listings {
+  max-width: 1200px;
+  margin: auto;
+  padding: 30px 20px;
+}
+
+/* Breadcrumb */
+
+.breadcrumb {
+  margin-bottom: 25px;
+  font-size: 14px;
+  color: #777;
+}
+
+.breadcrumb strong {
+  color: #222;
+}
+
+/* Main Layout */
+
+.listing-container {
+  display: flex;
+  gap: 30px;
+}
+
+/* Sidebar */
+
+.filters {
+  width: 250px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  height: fit-content;
+  background: #fff;
+}
+
+.filters h3 {
+  margin-bottom: 25px;
+}
+
+.filter-group {
+  margin-bottom: 30px;
+}
+
+.filter-group h4 {
+  margin-bottom: 12px;
+  font-size: 16px;
+}
+
+.filter-group label {
+  display: block;
+  margin-bottom: 10px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.filter-group input {
+  margin-right: 8px;
+}
+
+/* Right Section */
+
+.listing-content {
+  flex: 1;
+}
+
+/* Top Bar */
+
+.listing-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.listing-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.view-btn {
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  background: white;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: 0.3s;
+}
+
+.view-btn:hover {
+  background: #f3f3f3;
+}
+
+.view-btn.active {
+  background: #2d6cdf;
+  color: white;
+  border: none;
+}
+
+.listing-actions select {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Products Grid */
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+/* Products List */
+
+.products-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Pagination */
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 40px;
+}
+
+.pagination button {
+  padding: 10px 16px;
+  border: 1px solid #ddd;
+  background: white;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: 0.3s;
+}
+
+.pagination button:hover {
+  background: #f3f3f3;
+}
+
+.active-page {
+  background: #2d6cdf !important;
+  color: white;
+  border: none !important;
+}

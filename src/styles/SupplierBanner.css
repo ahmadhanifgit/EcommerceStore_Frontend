@@ -1,0 +1,83 @@
+.supplier-banner{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+padding:40px 50px;
+
+margin:30px 50px;
+
+background:#0d6efd;
+
+border-radius:10px;
+
+color:white;
+
+gap:40px;
+
+}
+
+.supplier-left{
+
+width:45%;
+
+}
+
+.supplier-left h2{
+
+font-size:32px;
+
+margin-bottom:15px;
+
+}
+
+.supplier-form{
+
+background:white;
+
+padding:25px;
+
+border-radius:8px;
+
+width:380px;
+
+display:flex;
+
+flex-direction:column;
+
+gap:15px;
+
+}
+
+.supplier-form input,
+
+.supplier-form textarea{
+
+padding:12px;
+
+border:1px solid #ddd;
+
+border-radius:5px;
+
+font-size:15px;
+
+}
+
+.supplier-form button{
+
+padding:12px;
+
+background:#0d6efd;
+
+border:none;
+
+color:white;
+
+cursor:pointer;
+
+border-radius:5px;
+
+}

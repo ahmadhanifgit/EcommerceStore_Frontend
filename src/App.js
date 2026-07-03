@@ -1,18 +1,75 @@
 import Header from "./components/Header/Header";
+
 import Footer from "./components/Footer/Footer";
 
-import "./App.css";
+import Home from "./pages/Home/Home";
 
-function App() {
-  return (
-    <div className="App">
-      <Header />
+import ProductListings from "./pages/ProductListings/ProductListings";
 
-      {/* Home page will be rendered here later */}
+import ProductDetails from "./pages/ProductDetails/ProductDetails";
 
-      <Footer />
-    </div>
-  );
+import Cart from "./pages/Cart/Cart";
+
+import {
+
+Routes,
+
+Route
+
+}
+
+from "react-router-dom";
+
+function App(){
+
+return(
+
+<>
+
+<Header/>
+
+<Routes>
+
+<Route
+
+path="/"
+
+element={<Home/>}
+
+/>
+
+<Route
+
+path="/listings"
+
+element={<ProductListings/>}
+
+/>
+
+<Route
+
+path="/details/:id"
+
+element={<ProductDetails/>}
+
+/>
+
+<Route
+
+path="/cart"
+
+element={<Cart/>}
+
+/>
+
+</Routes>
+
+<Footer/>
+
+</>
+
+);
+
 }
 
 export default App;

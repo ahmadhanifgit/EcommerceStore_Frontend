@@ -1,0 +1,23 @@
+.recommended{
+
+padding:30px 50px;
+
+}
+
+.recommended h2{
+
+margin-bottom:20px;
+
+font-size:28px;
+
+}
+
+.recommended-grid{
+
+display:grid;
+
+grid-template-columns:repeat(4,1fr);
+
+gap:20px;
+
+}

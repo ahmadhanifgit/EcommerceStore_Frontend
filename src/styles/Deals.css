@@ -1,0 +1,27 @@
+.deals{
+
+display:flex;
+
+padding:30px 50px;
+
+gap:20px;
+
+}
+
+.deal-info{
+
+width:220px;
+
+}
+
+.deal-products{
+
+display:grid;
+
+grid-template-columns:repeat(5,1fr);
+
+gap:20px;
+
+flex:1;
+
+}
