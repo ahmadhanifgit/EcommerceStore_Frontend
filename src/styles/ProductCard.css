@@ -12,6 +12,12 @@ transition:.3s;
 
 cursor:pointer;
 
+display:flex;
+
+flex-direction:column;
+
+height:100%;
+
 }
 
 .product-card:hover{
@@ -35,6 +41,34 @@ object-fit:contain;
 .product-info{
 
 margin-top:15px;
+
+flex:1;
+
+}
+
+.add-to-cart-btn{
+
+margin-top:12px;
+
+padding:10px 12px;
+
+border:none;
+
+border-radius:6px;
+
+background:#0d6efd;
+
+color:white;
+
+cursor:pointer;
+
+font-weight:600;
+
+}
+
+.add-to-cart-btn:hover{
+
+background:#0b5ed7;
 
 }
 

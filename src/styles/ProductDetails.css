@@ -26,6 +26,13 @@
     align-items:flex-start;
 }
 
+@media (max-width: 900px) {
+    .product-details-container{
+        flex-direction:column;
+        gap:30px;
+    }
+}
+
 .product-image-section{
     flex:1;
     display:flex;

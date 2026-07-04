@@ -20,6 +20,19 @@ gap:40px;
 
 }
 
+@media (max-width: 900px) {
+    .supplier-banner {
+        flex-direction: column;
+        margin: 20px;
+        padding: 30px 20px;
+    }
+
+    .supplier-left,
+    .supplier-form {
+        width: 100%;
+    }
+}
+
 .supplier-left{
 
 width:45%;

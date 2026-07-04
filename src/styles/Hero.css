@@ -12,6 +12,25 @@ background:#f5f7fa;
 
 }
 
+@media (max-width: 1000px) {
+    .hero {
+        grid-template-columns: 1fr;
+        padding: 20px;
+    }
+
+    .hero-menu {
+        order: 1;
+    }
+
+    .hero-banner {
+        order: 2;
+    }
+
+    .hero-right {
+        order: 3;
+    }
+}
+
 .hero-menu{
 
 background:white;
