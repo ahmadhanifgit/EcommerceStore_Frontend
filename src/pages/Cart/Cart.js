@@ -138,9 +138,9 @@ function Cart() {
 
           </div>
 
-          <button className="checkout-btn">
+          <Link to="/checkout" className="checkout-btn">
             Proceed to Checkout
-          </button>
+          </Link>
 
           <button
             className="clear-cart-btn"

@@ -1,11 +1,13 @@
+import { Link } from "react-router-dom";
+
 function TopBar() {
   return (
     <div className="top-bar">
-      <p>Free Shipping on Orders Over $50</p>
+      <p>Free Shipping on Orders Over $5000</p>
 
       <div className="top-links">
-        <span>Login</span>
-        <span>Register</span>
+        <Link to="/login">Login</Link>
+        <Link to="/signup">Register</Link>
       </div>
     </div>
   );

@@ -1,56 +1,66 @@
 import "../../../styles/SupplierBanner.css";
+import { useState } from "react";
 
 function SupplierBanner(){
+	const [item, setItem] = useState("");
+	const [message, setMessage] = useState("");
+	const [status, setStatus] = useState("");
 
-return(
+	const handleSend = (e) => {
+		e.preventDefault();
+		if (!item.trim() || !message.trim()) {
+			setStatus("Please fill both fields before sending.");
+			return;
+		}
 
-<section className="supplier-banner">
+		try {
+			const inquiries = JSON.parse(localStorage.getItem("inquiries") || "[]");
+			inquiries.push({ item: item.trim(), message: message.trim(), date: new Date().toISOString() });
+			localStorage.setItem("inquiries", JSON.stringify(inquiries));
+			setStatus("Inquiry sent. Suppliers will contact you soon.");
+			setItem("");
+			setMessage("");
+		} catch (err) {
+			console.error(err);
+			setStatus("Failed to send inquiry. Try again.");
+		}
+	};
 
-<div className="supplier-left">
+	return(
+		<section className="supplier-banner">
 
-<h2>
+			<div className="supplier-left">
 
-An easy way to send requests to suppliers
+				<h2>An easy way to send requests to suppliers</h2>
 
-</h2>
+				<p>Submit your sourcing request and receive quotes from verified suppliers.</p>
 
-<p>
+			</div>
 
-Submit your sourcing request and receive quotes from verified suppliers.
+			<form className="supplier-form" onSubmit={handleSend}>
 
-</p>
+				<input
+					type="text"
+					placeholder="What item do you need?"
+					value={item}
+					onChange={(e) => setItem(e.target.value)}
+				/>
 
-</div>
+				<textarea
+					rows="5"
+					placeholder="Describe your requirements"
+					value={message}
+					onChange={(e) => setMessage(e.target.value)}
+				></textarea>
 
-<div className="supplier-form">
+				<button type="submit">Send Inquiry</button>
 
-<input
+				{status && <p className="inquiry-status">{status}</p>}
 
-type="text"
+			</form>
 
-placeholder="What item do you need?"
-
-/>
-
-<textarea
-
-rows="5"
-
-placeholder="Describe your requirements"
-
-></textarea>
-
-<button>
-
-Send Inquiry
-
-</button>
-
-</div>
-
-</section>
-
-);
+		</section>
+	);
 
 }
 

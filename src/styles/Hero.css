@@ -97,24 +97,39 @@ border-radius:8px;
 
 }
 
-.user-card button{
+..user-card button{
+    width:100%;
+    padding:12px;
+    margin-top:12px;
+    border:none;
+    background:#0d6efd;
+    color:white;
+    cursor:pointer;
+    border-radius:6px;
+}
 
-width:100%;
+.user-card .hero-button{
+    display:block;
+    width:100%;
+    padding:12px;
+    margin-top:12px;
+    border:none;
+    background:#0d6efd;
+    color:white;
+    cursor:pointer;
+    border-radius:6px;
+    text-decoration:none;
+    font-weight:600;
+    transition: background 0.25s ease;
+}
 
-padding:10px;
+.user-card .hero-button:not(:first-child) {
+    margin-top:12px;
+}
 
-margin-top:10px;
-
-border:none;
-
-background:#0d6efd;
-
-color:white;
-
-cursor:pointer;
-
-border-radius:5px;
-
+.user-card .hero-button:hover,
+.user-card button:hover{
+    background:#1d4ed8;
 }
 
 .login-btn{

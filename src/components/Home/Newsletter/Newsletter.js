@@ -1,44 +1,53 @@
 import "../../../styles/Newsletter.css";
+import { useState } from "react";
 
 function Newsletter(){
+	const [email, setEmail] = useState("");
+	const [status, setStatus] = useState("");
 
-return(
+	const handleSubscribe = (e) => {
+		e.preventDefault();
+		const trimmed = email.trim();
+		if (!trimmed || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(trimmed)) {
+			setStatus("Please enter a valid email address.");
+			return;
+		}
 
-<section className="newsletter">
+		// Save to localStorage as a simple persistence and show feedback
+		try {
+			const subs = JSON.parse(localStorage.getItem("newsletterSubs") || "[]");
+			subs.push({ email: trimmed, date: new Date().toISOString() });
+			localStorage.setItem("newsletterSubs", JSON.stringify(subs));
+			setStatus("Thanks! You're subscribed.");
+			setEmail("");
+		} catch (err) {
+			console.error(err);
+			setStatus("Subscription failed. Try again.");
+		}
+	};
 
-<h2>
+	return(
+		<section className="newsletter">
 
-Subscribe To Our Newsletter
+			<h2>Subscribe To Our Newsletter</h2>
 
-</h2>
+			<p>Get daily updates on products and offers.</p>
 
-<p>
+			<form className="newsletter-box" onSubmit={handleSubscribe}>
+				<input
+					type="email"
+					placeholder="Enter your email"
+					value={email}
+					onChange={(e) => setEmail(e.target.value)}
+				/>
 
-Get daily updates on products and offers.
+				<button type="submit">Subscribe</button>
+			</form>
 
-</p>
+			{status && <p className="newsletter-status">{status}</p>}
 
-<div className="newsletter-box">
-
-<input
-
-type="email"
-
-placeholder="Enter your email"
-
-/>
-
-<button>
-
-Subscribe
-
-</button>
-
-</div>
-
-</section>
-
-);
+		</section>
+	);
 
 }
 

@@ -2,6 +2,7 @@ import "../../../styles/Hero.css"
 
 import heroBanner from "../../../assets/images/hero/hero-banner.jpg";
 
+import { Link } from "react-router-dom";
 import {
   FaUserCircle,
   FaGift,
@@ -61,11 +62,13 @@ function Hero() {
 
           <h4>Hi, User</h4>
 
-          <button>Join Now</button>
+          <Link to="/signup" className="hero-button join-btn">
+            Join Now
+          </Link>
 
-          <button className="login-btn">
+          <Link to="/login" className="hero-button login-btn">
             Log In
-          </button>
+          </Link>
 
         </div>
 

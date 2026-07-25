@@ -1,6 +1,10 @@
 import SearchBar from "./SearchBar";
+import { Link } from "react-router-dom";
+import { useCart } from "../../context/CartContext";
 
 function MainHeader() {
+  const { cartCount } = useCart();
+
   return (
     <div className="main-header">
 
@@ -9,11 +13,10 @@ function MainHeader() {
       <SearchBar />
 
       <div className="header-icons">
-
-        <span>♡ Wishlist</span>
-
-        <span>🛒 Cart</span>
-
+        <Link to="/cart" className="cart-icon">
+          <span>🛒</span>
+          {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
+        </Link>
       </div>
 
     </div>

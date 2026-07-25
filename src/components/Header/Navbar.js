@@ -23,6 +23,8 @@ function Navbar() {
 
       </Link>
 
+      <Link to="/checkout">Checkout</Link>
+
     </nav>
   );
 }
