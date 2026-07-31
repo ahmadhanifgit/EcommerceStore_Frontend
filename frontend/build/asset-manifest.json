@@ -1,0 +1,40 @@
+{
+  "files": {
+    "main.css": "/static/css/main.2a0e5143.css",
+    "main.js": "/static/js/main.0955d952.js",
+    "static/media/camping-tent.jpg": "/static/media/camping-tent.a39f82ccdda57c831a1e.jpg",
+    "static/media/bicycle.jpg": "/static/media/bicycle.2f2dc6a913eefcbda17c.jpg",
+    "static/media/warehouse.jpg": "/static/media/warehouse.9c4cfd2f7a0b7866a569.jpg",
+    "static/media/coffee-maker.jpg": "/static/media/coffee-maker.a998dc6252a854b9113a.jpg",
+    "static/media/laptop.jpg": "/static/media/laptop.1049e14985bc0caa0efc.jpg",
+    "static/media/smartphone.jpg": "/static/media/smartphone.eddfce4d4a194385379b.jpg",
+    "static/media/tshirt.jpg": "/static/media/tshirt.07c0be81d6fb8fb52c0d.jpg",
+    "static/media/chair.jpg": "/static/media/chair.0e21ddfca7600705eb46.jpg",
+    "static/media/home-banner.jpg": "/static/media/home-banner.d9634204fc53f34a6b8c.jpg",
+    "static/media/blender.jpg": "/static/media/blender.5d9547dcd6a94b600714.jpg",
+    "static/media/customization.jpg": "/static/media/customization.9fa034856ff4b5b5437b.jpg",
+    "static/media/backpack.jpg": "/static/media/backpack.4e874be26b3bbe24d199.jpg",
+    "static/media/hero-banner.jpg": "/static/media/hero-banner.0809f3bd6e30afa2c394.jpg",
+    "static/media/electronics-banner.jpg": "/static/media/electronics-banner.211edb8fc12ae9ea166b.jpg",
+    "static/media/running-shoes.jpg": "/static/media/running-shoes.8106fb675244e933c267.jpg",
+    "static/media/microwave.jpg": "/static/media/microwave.3dc61fb68a060772a7ff.jpg",
+    "static/media/hoodie.jpg": "/static/media/hoodie.fc2570d42f68daa4efcb.jpg",
+    "static/media/smartwatch.jpg": "/static/media/smartwatch.2a52b49aaab8784e4ecd.jpg",
+    "static/media/football.jpg": "/static/media/football.304c2985f93be32bac2c.jpg",
+    "static/media/inspection.jpg": "/static/media/inspection.e5e4a21815c484b4fb63.jpg",
+    "static/media/dinner-set.jpg": "/static/media/dinner-set.fd7b19147897c8c4cd51.jpg",
+    "static/media/shipping.jpg": "/static/media/shipping.9bfd5970279de4b8b6ce.jpg",
+    "static/media/table-lamp.jpg": "/static/media/table-lamp.12283d2f6bfc405f45a1.jpg",
+    "static/media/sofa.jpg": "/static/media/sofa.b5174e12556ac29f0ca3.jpg",
+    "static/media/electric-kettle.jpg": "/static/media/electric-kettle.544d4bdb94bfb41f693e.jpg",
+    "static/media/jeans.jpg": "/static/media/jeans.b845a12ab60b8fbaa928.jpg",
+    "static/media/headphones.jpg": "/static/media/headphones.505a79e569120fd539c9.jpg",
+    "index.html": "/index.html",
+    "main.2a0e5143.css.map": "/static/css/main.2a0e5143.css.map",
+    "main.0955d952.js.map": "/static/js/main.0955d952.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.2a0e5143.css",
+    "static/js/main.0955d952.js"
+  ]
+}
