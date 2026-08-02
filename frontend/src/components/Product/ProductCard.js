@@ -6,6 +6,14 @@ function ProductCard({ product, variant = "default", showAddToCartButton = false
   const { addToCart } = useCart();
   const navigate = useNavigate();
 
+  if (!product) return null;
+
+  const productId = product._id || product.id;
+  const productTitle = product.name || product.title || "Product";
+  //following code commented out as product rating and reviews are not available from the backend and they were showing default values hardcoded
+  //const productRating = product.rating !== undefined ? product.rating : 4.5;
+  //const productReviews = product.reviews !== undefined ? product.reviews : 12;
+
   const handleAddToCart = (event) => {
     event.preventDefault();
     event.stopPropagation();
@@ -13,7 +21,7 @@ function ProductCard({ product, variant = "default", showAddToCartButton = false
   };
 
   const handleCardClick = () => {
-    navigate(`/details/${product.id}`);
+    navigate(`/details/${productId}`);
   };
 
   const handleCardKeyDown = (event) => {
@@ -33,20 +41,20 @@ function ProductCard({ product, variant = "default", showAddToCartButton = false
     >
       <img
         src={product.image}
-        alt={product.title}
+        alt={productTitle}
         className="product-image"
       />
 
       <div className="product-info">
-        <h3>{product.title}</h3>
+        <h3>{productTitle}</h3>
 
         <p className="price">${product.price}</p>
 
         <p className="category">{product.category}</p>
 
-        <p className="rating">
-          ⭐ {product.rating} ({product.reviews})
-        </p>
+        {/*<p className="rating">
+          ⭐ {productRating} ({productReviews})
+        </p>*/}
       </div>
 
       {showAddToCartButton && (

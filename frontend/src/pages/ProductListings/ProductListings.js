@@ -1,81 +1,66 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import "../../styles/ProductListings.css";
-
-import productsData from "../../data/products.json";
-import backpack from "../../assets/images/products/backpack.jpg";
-import bicycle from "../../assets/images/products/bicycle.jpg";
-import blender from "../../assets/images/products/blender.jpg";
-import campingTent from "../../assets/images/products/camping-tent.jpg";
-import chair from "../../assets/images/products/chair.jpg";
-import coffeeMaker from "../../assets/images/products/coffee-maker.jpg";
-import dinnerSet from "../../assets/images/products/dinner-set.jpg";
-import electricKettle from "../../assets/images/products/electric-kettle.jpg";
-import football from "../../assets/images/products/football.jpg";
-import headphones from "../../assets/images/products/headphones.jpg";
-import hoodie from "../../assets/images/products/hoodie.jpg";
-import jeans from "../../assets/images/products/jeans.jpg";
-import laptop from "../../assets/images/products/laptop.jpg";
-import microwave from "../../assets/images/products/microwave.jpg";
-import runningShoes from "../../assets/images/products/running-shoes.jpg";
-import smartphone from "../../assets/images/products/smartphone.jpg";
-import smartwatch from "../../assets/images/products/smartwatch.jpg";
-import sofa from "../../assets/images/products/sofa.jpg";
-import tableLamp from "../../assets/images/products/table-lamp.jpg";
-import tshirt from "../../assets/images/products/tshirt.jpg";
 import ProductCard from "../../components/Product/ProductCard";
 
-const imageMap = {
-  backpack,
-  bicycle,
-  blender,
-  "camping-tent": campingTent,
-  chair,
-  coffeeMaker,
-  dinnerSet,
-  electricKettle,
-  football,
-  headphones,
-  hoodie,
-  jeans,
-  laptop,
-  microwave,
-  runningShoes,
-  smartphone,
-  smartwatch,
-  sofa,
-  tableLamp,
-  tshirt,
-};
-
-const products = productsData.map((product) => ({
-  ...product,
-  image: imageMap[product.imageKey] || "",
-}));
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api/products";
 
 const ProductListings = () => {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const [view, setView] = useState("grid");
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [priceFilter, setPriceFilter] = useState("");
-  const [selectedRatings, setSelectedRatings] = useState([]);
+  //const [selectedRatings, setSelectedRatings] = useState([]);
   const [inStockOnly, setInStockOnly] = useState(false);
   const [sortBy, setSortBy] = useState("");
   const [searchParams] = useSearchParams();
 
   const searchTerm = (searchParams.get("q") || "").trim().toLowerCase();
-  const minRating = selectedRatings.includes("4") ? 4 : selectedRatings.includes("3") ? 3 : 0;
+  //const minRating = selectedRatings.includes("4") ? 4 : selectedRatings.includes("3") ? 3 : 0;
+
+  const fetchProducts = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(API_URL);
+      if (!response.ok) {
+        throw new Error(`Server returned error status ${response.status}`);
+      }
+      const data = await response.json();
+      const productList = Array.isArray(data) ? data : (data.data || []);
+      setProducts(productList);
+    } catch (err) {
+      console.error("Failed to fetch products from backend API:", err);
+      setError("Unable to load products. Please check if the backend server is running.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
   const filteredProducts = useMemo(() => {
     const result = products.filter((product) => {
+      const title = product.name || product.title || "";
+      const category = product.category || "";
+      const brand = product.brand || "";
+      const description = product.description || "";
+      //const rating = product.rating !== undefined ? product.rating : 4.5;
+
       const matchesSearch =
         !searchTerm ||
-        [product.title, product.category, product.brand, product.description]
+        [title, category, brand, description]
           .join(" ")
           .toLowerCase()
           .includes(searchTerm);
 
       const matchesCategory =
-        selectedCategories.length === 0 || selectedCategories.includes(product.category);
+        selectedCategories.length === 0 || selectedCategories.includes(category);
 
       const matchesPrice = (() => {
         if (priceFilter === "under100") return product.price < 100;
@@ -84,25 +69,25 @@ const ProductListings = () => {
         return true;
       })();
 
-      const matchesRating = !minRating || product.rating >= minRating;
-      const matchesAvailability = !inStockOnly || product.stock > 0;
+      //const matchesRating = !minRating || rating >= minRating;
+      const matchesAvailability = !inStockOnly || (product.stock && product.stock > 0);
 
-      return matchesSearch && matchesCategory && matchesPrice && matchesRating && matchesAvailability;
+      return matchesSearch && matchesCategory && matchesPrice && matchesAvailability;
     });
 
     switch (sortBy) {
       case "newest":
-        return [...result].sort((a, b) => b.id - a.id);
+        return [...result].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
       case "price-low":
         return [...result].sort((a, b) => a.price - b.price);
       case "price-high":
         return [...result].sort((a, b) => b.price - a.price);
-      case "highest-rated":
-        return [...result].sort((a, b) => b.rating - a.rating);
+      //case "highest-rated":
+      //  return [...result].sort((a, b) => (b.rating || 4.5) - (a.rating || 4.5));
       default:
         return result;
     }
-  }, [inStockOnly, minRating, priceFilter, searchTerm, selectedCategories, sortBy]);
+  }, [products, inStockOnly, priceFilter, searchTerm, selectedCategories, sortBy]);
 
   const toggleCategory = (category) => {
     setSelectedCategories((prevCategories) =>
@@ -112,14 +97,13 @@ const ProductListings = () => {
     );
   };
 
-  const toggleRating = (value) => {
+  /*const toggleRating = (value) => {
     setSelectedRatings((prevRatings) =>
       prevRatings.includes(value)
         ? prevRatings.filter((item) => item !== value)
         : [...prevRatings, value]
     );
-  };
-
+  };*/
   return (
     <div className="product-listings">
       <div className="breadcrumb">
@@ -191,7 +175,7 @@ const ProductListings = () => {
             </label>
           </div>
 
-          <div className="filter-group">
+          {/*<div className="filter-group">
             <h4>Rating</h4>
 
             <label>
@@ -211,7 +195,7 @@ const ProductListings = () => {
               />
               3★ & Above
             </label>
-          </div>
+          </div>*/}
 
           <div className="filter-group">
             <h4>Availability</h4>
@@ -251,28 +235,43 @@ const ProductListings = () => {
                 <option value="newest">Newest</option>
                 <option value="price-low">Price: Low to High</option>
                 <option value="price-high">Price: High to Low</option>
-                <option value="highest-rated">Highest Rated</option>
+                {/*<option value="highest-rated">Highest Rated</option>*/}
               </select>
             </div>
           </div>
 
-          <div className={view === "grid" ? "products-grid" : "products-list"}>
-            {filteredProducts.length > 0 ? (
-              filteredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} showAddToCartButton />
-              ))
-            ) : (
-              <h2>No Products Found</h2>
-            )}
-          </div>
+          {loading ? (
+            <div className="loading-state">
+              <div className="spinner"></div>
+              <p>Loading products from server...</p>
+            </div>
+          ) : error ? (
+            <div className="error-state">
+              <h3>⚠️ Connection Error</h3>
+              <p>{error}</p>
+              <button className="retry-btn" onClick={fetchProducts}>
+                Retry
+              </button>
+            </div>
+          ) : (
+            <div className={view === "grid" ? "products-grid" : "products-list"}>
+              {filteredProducts.length > 0 ? (
+                filteredProducts.map((product) => (
+                  <ProductCard key={product._id || product.id} product={product} showAddToCartButton />
+                ))
+              ) : (
+                <h2>No Products Found</h2>
+              )}
+            </div>
+          )}
 
-          <div className="pagination">
-            <button>{"<"}</button>
-            <button className="active-page">1</button>
-            <button>2</button>
-            <button>3</button>
-            <button>{">"}</button>
-          </div>
+          {!loading && !error && filteredProducts.length > 0 && (
+            <div className="pagination">
+              <button>{"<"}</button>
+              <button className="active-page">1</button>
+              <button>{">"}</button>
+            </div>
+          )}
         </section>
       </div>
     </div>

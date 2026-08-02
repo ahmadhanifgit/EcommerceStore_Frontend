@@ -27,14 +27,21 @@ function CartProvider({ children }) {
   }, [cartItems]);
 
   const addToCart = (product, quantity) => {
+    const targetId = product._id || product.id;
+    const normalizedProduct = {
+      ...product,
+      id: targetId,
+      title: product.name || product.title || "Product"
+    };
+
     setCartItems((prevItems) => {
       const existingItem = prevItems.find(
-        (item) => item.id === product.id
+        (item) => (item._id || item.id) === targetId
       );
 
       if (existingItem) {
         return prevItems.map((item) =>
-          item.id === product.id
+          (item._id || item.id) === targetId
             ? {
                 ...item,
                 quantity: item.quantity + quantity,
@@ -46,7 +53,7 @@ function CartProvider({ children }) {
       return [
         ...prevItems,
         {
-          ...product,
+          ...normalizedProduct,
           quantity,
         },
       ];
@@ -55,18 +62,18 @@ function CartProvider({ children }) {
 
   const removeFromCart = (id) => {
     setCartItems((prevItems) =>
-      prevItems.filter((item) => item.id !== id)
+      prevItems.filter((item) => (item._id || item.id) !== id)
     );
   };
 
   const increaseCartQuantity = (id) => {
     setCartItems((prevItems) =>
       prevItems.map((item) =>
-        item.id === id
+        (item._id || item.id) === id
           ? {
               ...item,
               quantity:
-                item.quantity < item.stock
+                item.quantity < (item.stock || 99)
                   ? item.quantity + 1
                   : item.quantity,
             }
@@ -79,7 +86,7 @@ function CartProvider({ children }) {
     setCartItems((prevItems) =>
       prevItems
         .map((item) =>
-          item.id === id
+          (item._id || item.id) === id
             ? {
                 ...item,
                 quantity: item.quantity - 1,
