@@ -486,7 +486,7 @@ For single product:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/EcommerceStore_Frontend.git
+git clone https://github.com/ahmadhanifgit/EcommerceStore_Frontend.git
 cd EcommerceStore_Frontend
 ```
 
