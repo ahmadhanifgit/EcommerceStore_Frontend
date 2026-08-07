@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { placeOrder } from "../../services/orderService";
 import validation, { getErrorMessage } from "../../utils/validation";
 import "../../styles/Checkout.css";
 
@@ -24,6 +25,8 @@ function Checkout() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [orderTotal, setOrderTotal] = useState(null);
+  const [orderId, setOrderId] = useState(null);
+  const [submitError, setSubmitError] = useState("");
 
   const shipping = cartItems.length > 0 ? 20 : 0;
   const tax = ((cartTotal + shipping) * 0.1).toFixed(2);
@@ -172,6 +175,18 @@ function Checkout() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Prevent duplicate submissions while a request is already in flight
+    if (isSubmitting) {
+      return;
+    }
+
+    // Must be logged in to place an order (route is protected, but double-check)
+    if (!user) {
+      setSubmitError("Please log in to place your order.");
+      navigate("/login");
+      return;
+    }
+
     if (cartItems.length === 0) {
       alert("Your cart is empty. Add items before checking out.");
       navigate("/listings");
@@ -182,16 +197,32 @@ function Checkout() {
       return;
     }
 
+    setSubmitError("");
     setIsSubmitting(true);
-    const calculatedTotal = parseFloat(grandTotal);
-    // Show order success immediately and preserve total before clearing cart
+
+    // Build the product lines the backend expects. The server verifies each
+    // product and recalculates the total — we only send IDs and quantities.
+    const products = cartItems.map((item) => ({
+      productId: item._id || item.id,
+      quantity: item.quantity,
+    }));
+
     try {
-      setOrderTotal(calculatedTotal.toFixed(2));
+      const order = await placeOrder(products);
+
+      // Show success using the real values returned by the backend
+      setOrderId(order._id);
+      setOrderTotal(Number(order.totalPrice).toFixed(2));
       setOrderPlaced(true);
+
+      // Clear the cart only after the order is confirmed saved
       clearCart();
-      setIsSubmitting(false);
     } catch (error) {
       console.error("Order failed:", error);
+      setSubmitError(
+        error.message || "Something went wrong while placing your order."
+      );
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -205,7 +236,7 @@ function Checkout() {
           <h2>Order Placed Successfully!</h2>
           <p>Thank you for your purchase.</p>
           <p className="order-details">
-            Order ID: <strong>#{Math.floor(Math.random() * 1000000)}</strong>
+            Order ID: <strong>#{orderId}</strong>
           </p>
           <p className="order-total">
             Total: <strong>${orderTotal ?? grandTotal}</strong>
@@ -368,13 +399,20 @@ function Checkout() {
               )}
             </div>
 
+            {/* API / submission error banner */}
+            {submitError && (
+              <div className="checkout-error" role="alert">
+                {submitError}
+              </div>
+            )}
+
             {/* Submit Button */}
             <button
               type="submit"
               className="place-order-btn"
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Processing..." : "Place Order"}
+              {isSubmitting ? "Placing Order..." : "Place Order"}
             </button>
           </form>
         </div>

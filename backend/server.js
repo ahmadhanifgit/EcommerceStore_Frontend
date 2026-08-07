@@ -8,6 +8,7 @@ require('dotenv').config();
 
 const Product = require('./models/Product');
 const authRoutes = require('./routes/authRoutes');
+const orderRoutes = require('./routes/orderRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -36,6 +37,9 @@ mongoose.connection.on('disconnected', () => {
 
 // Auth Routes — POST /api/auth/register and POST /api/auth/login
 app.use('/api/auth', authRoutes);
+
+// Order Routes — POST /api/orders (create) and GET /api/orders (list own orders)
+app.use('/api/orders', orderRoutes);
 
 // Root Route
 app.get('/', (req, res) => {

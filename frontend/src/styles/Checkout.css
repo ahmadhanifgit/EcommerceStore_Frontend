@@ -137,6 +137,17 @@
   cursor: not-allowed;
 }
 
+/* Checkout submission / API error banner */
+.checkout-error {
+  background: #fdecea;
+  border: 1px solid #f5c6cb;
+  color: #b02a37;
+  padding: 12px 14px;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
 /* Order Summary Section */
 .order-summary-section {
   background: white;

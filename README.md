@@ -1,28 +1,45 @@
 # Ecommerce Store — Full-Stack Web Application
 
-A complete full-stack ecommerce web application built with **React** (frontend), **Express.js** (backend), and **MongoDB Atlas** (database). The project delivers a real online shopping experience including product browsing, search and filtering, detailed product views, cart management, user authentication, and checkout.
+A complete full-stack ecommerce web application built with **React** (frontend), **Express.js** (backend), and **MongoDB Atlas** (database). The project delivers a real online shopping experience including product browsing, search and filtering, detailed product views, cart management, real JWT-based user authentication, order placement, and checkout.
 
 ---
 
 ## Table of Contents
 
-1. [Tech Stack](#tech-stack)
-2. [Architecture Overview](#architecture-overview)
-3. [Project Structure](#project-structure)
-4. [Frontend](#frontend)
-5. [Backend](#backend)
-6. [MongoDB Atlas Database](#mongodb-atlas-database)
-7. [Data Flow — How It All Works Together](#data-flow--how-it-all-works-together)
-8. [API Endpoints](#api-endpoints)
-9. [Environment Variables](#environment-variables)
-10. [Installation and Setup](#installation-and-setup)
-11. [Running the Application](#running-the-application)
-12. [Features Breakdown](#features-breakdown)
-13. [State Management](#state-management)
-14. [Routing](#routing)
-15. [Security Considerations](#security-considerations)
-16. [Current Implementation Notes](#current-implementation-notes)
-17. [Possible Future Enhancements](#possible-future-enhancements)
+1. [Recent Updates](#recent-updates)
+2. [Tech Stack](#tech-stack)
+3. [Architecture Overview](#architecture-overview)
+4. [Project Structure](#project-structure)
+5. [Frontend](#frontend)
+6. [Backend](#backend)
+7. [MongoDB Atlas Database](#mongodb-atlas-database)
+8. [Data Flow — How It All Works Together](#data-flow--how-it-all-works-together)
+9. [API Endpoints](#api-endpoints)
+10. [Environment Variables](#environment-variables)
+11. [Installation and Setup](#installation-and-setup)
+12. [Running the Application](#running-the-application)
+13. [Features Breakdown](#features-breakdown)
+14. [State Management](#state-management)
+15. [Routing](#routing)
+16. [Security Considerations](#security-considerations)
+17. [Current Implementation Notes](#current-implementation-notes)
+18. [Possible Future Enhancements](#possible-future-enhancements)
+
+---
+
+## Recent Updates
+
+The following features were added **this week** and extend the product/cart foundation documented previously. Authentication is now backed by a real API (it is no longer simulated), and orders are now persisted to the database.
+
+- **User model** — a Mongoose `User` schema with `name`, `email`, and `password` (bcrypt-hashed).
+- **`POST /api/auth/register`** — registers a new user and stores the password as a bcrypt hash (never plain text).
+- **`POST /api/auth/login`** — verifies credentials and returns a signed **JWT token**.
+- **JWT stored in `localStorage`** — after a successful login the frontend saves the token (key `token`) and user (key `user`) in `localStorage` and sends the token as `Authorization: Bearer <token>` on protected requests.
+- **Protected routes** — the **Cart** and **Checkout** pages are now accessible to logged-in users only; unauthenticated visitors are redirected to `/login`.
+- **Order model** — a Mongoose `Order` schema with `user`, `products`, `totalPrice`, `status`, and `createdAt`.
+- **`POST /api/orders`** — a protected endpoint that saves a new order to MongoDB when **Place Order** is clicked on the checkout page.
+
+> Sections below (Project Structure, Backend, API Endpoints, Data Flow, Security, etc.) have been updated to reflect these changes.
 
 ---
 
@@ -35,6 +52,7 @@ A complete full-stack ecommerce web application built with **React** (frontend),
 | Icons       | React Icons                 | Icon library for UI elements                |
 | Backend     | Node.js, Express 5          | REST API server                             |
 | Database    | MongoDB Atlas (Mongoose 9)  | Cloud-hosted NoSQL document database        |
+| Auth        | jsonwebtoken (JWT), bcrypt  | Token-based authentication, password hashing |
 | CORS        | cors package                | Cross-origin resource sharing               |
 | Env Config  | dotenv                      | Environment variable management             |
 
@@ -45,9 +63,10 @@ A complete full-stack ecommerce web application built with **React** (frontend),
 ```
 ┌──────────────────────┐         HTTP Requests         ┌──────────────────────┐
 │                      │  ──────────────────────────►   │                      │
-│   React Frontend     │    GET /api/products           │   Express Backend    │
-│   (localhost:3000)    │    GET /api/products/:id       │   (localhost:5000)   │
-│                      │    POST /api/products          │                      │
+│   React Frontend     │    GET  /api/products          │   Express Backend    │
+│   (localhost:3000)    │    POST /api/auth/register     │   (localhost:5000)   │
+│                      │    POST /api/auth/login        │                      │
+│                      │    POST /api/orders  (JWT)     │                      │
 │                      │  ◄──────────────────────────   │                      │
 │                      │         JSON Responses         │                      │
 └──────────────────────┘                                └──────────┬───────────┘
@@ -59,8 +78,10 @@ A complete full-stack ecommerce web application built with **React** (frontend),
                                                         │   MongoDB Atlas      │
                                                         │   (Cloud Cluster)    │
                                                         │   DB: ecommerce      │
-                                                        │   Collection:        │
+                                                        │   Collections:       │
                                                         │     products         │
+                                                        │     users            │
+                                                        │     orders           │
                                                         │                      │
                                                         └──────────────────────┘
 ```
@@ -68,6 +89,7 @@ A complete full-stack ecommerce web application built with **React** (frontend),
 - The **frontend** runs on `http://localhost:3000` and makes `fetch()` calls to the backend API.
 - The **backend** runs on `http://localhost:5000`, handles REST API requests, and communicates with MongoDB Atlas using Mongoose.
 - **CORS** is enabled on the backend so the frontend (different port) can make cross-origin requests.
+- **Protected endpoints** (e.g. `POST /api/orders`) require a valid **JWT** sent in the `Authorization: Bearer <token>` header.
 
 ---
 
@@ -80,11 +102,21 @@ EcommerceStore_Frontend/
 ├── quick_reference.md
 │
 ├── backend/
-│   ├── .env                         # MongoDB connection string (not pushed to GitHub)
+│   ├── .env                         # Secrets: MongoDB URI + JWT config (not pushed to GitHub)
 │   ├── package.json                 # Backend dependencies
-│   ├── server.js                    # Express server — routes, middleware, DB connection
-│   └── models/
-│       └── Product.js               # Mongoose product schema/model
+│   ├── server.js                    # Express server — middleware, DB connection, route mounting
+│   ├── models/
+│   │   ├── Product.js               # Mongoose product schema/model
+│   │   ├── User.js                  # Mongoose user schema/model (bcrypt-hashed password)
+│   │   └── Order.js                 # Mongoose order schema/model
+│   ├── controllers/
+│   │   ├── authController.js        # register + login business logic
+│   │   └── orderController.js       # create order + list-own-orders logic
+│   ├── middleware/
+│   │   └── authMiddleware.js        # JWT verification — protects private routes
+│   └── routes/
+│       ├── authRoutes.js            # POST /api/auth/register, POST /api/auth/login
+│       └── orderRoutes.js           # POST /api/orders, GET /api/orders (protected)
 │
 └── frontend/
     ├── package.json                 # Frontend dependencies
@@ -115,12 +147,18 @@ EcommerceStore_Frontend/
         │   │   ├── SupplierBanner/  # Supplier promotion banner
         │   │   ├── Suppliers/       # Suppliers listing section
         │   │   └── Newsletter/      # Newsletter subscription section
-        │   └── Product/
-        │       └── ProductCard.js   # Reusable product card component
+        │   ├── Product/
+        │   │   └── ProductCard.js   # Reusable product card component
+        │   └── ProtectedRoute/
+        │       └── ProtectedRoute.js # Guards Cart/Checkout — redirects guests to /login
         │
         ├── context/
         │   ├── CartContext.js        # Cart state provider (localStorage persisted)
         │   └── AuthContext.js        # Auth state provider (localStorage persisted)
+        │
+        ├── services/
+        │   ├── authService.js        # register/login API calls + token storage
+        │   └── orderService.js       # placeOrder() / getMyOrders() API calls
         │
         ├── data/
         │   └── products.json        # Legacy local product data (no longer primary source)
@@ -217,12 +255,14 @@ The backend is a **Node.js** server using **Express 5** that provides a RESTful 
 
 ### Key Backend Dependencies
 
-| Package   | Version  | Purpose                                    |
-|-----------|----------|--------------------------------------------|
-| express   | ^5.2.1   | Web framework for REST API                 |
-| mongoose  | ^9.9.0   | MongoDB ODM (Object Document Mapper)       |
-| cors      | ^2.8.6   | Cross-Origin Resource Sharing middleware    |
-| dotenv    | ^17.4.2  | Load environment variables from `.env`     |
+| Package        | Version  | Purpose                                    |
+|----------------|----------|--------------------------------------------|
+| express        | ^5.2.1   | Web framework for REST API                 |
+| mongoose       | ^9.9.0   | MongoDB ODM (Object Document Mapper)       |
+| bcrypt         | ^6.0.0   | Hashing user passwords before storage      |
+| jsonwebtoken   | ^9.0.3   | Signing and verifying JWT auth tokens      |
+| cors           | ^2.8.6   | Cross-Origin Resource Sharing middleware    |
+| dotenv         | ^17.4.2  | Load environment variables from `.env`     |
 
 ### Server Configuration (server.js)
 
@@ -231,8 +271,14 @@ The backend server performs the following on startup:
 1. **Loads environment variables** — `require('dotenv').config()` reads the `.env` file
 2. **Sets up middleware** — CORS (`app.use(cors())`), JSON parsing, URL-encoded body parsing
 3. **Connects to MongoDB Atlas** — Using Mongoose with the connection string from `MONGO_URI`
-4. **Registers routes** — All product CRUD endpoints under `/api/products`
+4. **Registers routes** — Product CRUD under `/api/products`, auth under `/api/auth`, and orders under `/api/orders`
 5. **Starts listening** — On port `5000` (configurable via `PORT` env var)
+
+Route modules are mounted in `server.js`:
+```javascript
+app.use('/api/auth', authRoutes);     // register + login
+app.use('/api/orders', orderRoutes);  // create order (protected) + list own orders
+```
 
 ### CORS Configuration
 
@@ -260,6 +306,48 @@ The Mongoose schema defines the product document structure stored in MongoDB:
 
 The schema uses `strict: false` which allows additional fields not defined in the schema to be stored.
 
+### User Model (User.js)
+
+Stores registered users. Passwords are **never stored in plain text** — the `authController` hashes them with bcrypt before saving.
+
+| Field     | Type   | Required | Constraints                                   |
+|-----------|--------|----------|-----------------------------------------------|
+| name      | String | Yes      | Trimmed                                       |
+| email     | String | Yes      | Unique, lowercased, trimmed                   |
+| password  | String | Yes      | Minimum 6 characters, stored as a bcrypt hash |
+| createdAt | Date   | Auto     | Mongoose timestamps                           |
+| updatedAt | Date   | Auto     | Mongoose timestamps                           |
+
+The `email` field has a `unique` index, so registering with an email that already exists is rejected.
+
+### Order Model (Order.js)
+
+Stores a customer's order. Mongoose creates the `orders` collection automatically the first time an order is saved — no manual setup needed.
+
+| Field      | Type                | Required | Default   | Notes                                             |
+|------------|---------------------|----------|-----------|---------------------------------------------------|
+| user       | ObjectId (→ `User`) | Yes      | —         | Taken from the JWT (`req.user.id`), never the body |
+| products   | Array               | Yes      | —         | Must contain at least one item (see below)        |
+| totalPrice | Number              | Yes      | —         | Minimum 0; recalculated/verified on the server    |
+| status     | String (enum)       | No       | `Pending` | `Pending`, `Processing`, `Shipped`, `Delivered`, `Cancelled` |
+| createdAt  | Date                | Auto     | —         | Mongoose timestamps                               |
+| updatedAt  | Date                | Auto     | —         | Mongoose timestamps                               |
+
+Each entry in `products` is a sub-document that snapshots the product at purchase time (so the order stays accurate even if the product is later edited):
+
+| Field     | Type                   | Required | Notes                        |
+|-----------|------------------------|----------|------------------------------|
+| productId | ObjectId (→ `Product`) | Yes      | Reference to the product     |
+| title     | String                 | Yes      | Product name at purchase     |
+| price     | Number                 | Yes      | Minimum 0                    |
+| quantity  | Number                 | Yes      | Minimum 1                    |
+| image     | String                 | No       | Product image URL            |
+
+### Authentication (authController + authMiddleware)
+
+- **`authController.js`** contains the business logic for `register` and `login`. On register, the password is hashed with bcrypt; on login, the submitted password is compared against the stored hash and, on success, a **JWT** is signed with `JWT_SECRET` (expiry from `JWT_EXPIRES_IN`).
+- **`authMiddleware.js`** protects private routes. It reads the `Authorization: Bearer <token>` header, verifies the JWT, and attaches the decoded user to `req.user`. Controllers then read the user ID from `req.user.id` — the client can never spoof which user an order belongs to.
+
 ---
 
 ## MongoDB Atlas Database
@@ -269,7 +357,7 @@ The schema uses `strict: false` which allows additional fields not defined in th
 - **Service**: MongoDB Atlas (cloud-hosted)
 - **Cluster**: `itsimplera-frontend.kstkkn8.mongodb.net`
 - **Database Name**: `ecommerce`
-- **Collection**: `products`
+- **Collections**: `products`, `users`, `orders`
 - **Connection Method**: Mongoose ODM via connection string in `.env`
 
 ### How the Connection Works
@@ -396,6 +484,58 @@ All products are fetched from API, then filtered client-side:
   - Sort: newest, price low-to-high, price high-to-low
 ```
 
+### 5. Authentication Flow (Register + Login)
+
+```
+User submits Signup form
+       │
+       ▼
+authService.register(name, email, password)
+       │
+       ▼
+POST /api/auth/register  →  authController hashes password with bcrypt  →  saves User
+       │
+       ▼
+User submits Login form  →  authService.login(email, password)
+       │
+       ▼
+POST /api/auth/login  →  bcrypt.compare(password, hash)
+       │
+       ▼
+On success: JWT signed with JWT_SECRET, returned in { data: { token, user } }
+       │
+       ▼
+Frontend stores token ("token") and user ("user") in localStorage (AuthContext)
+```
+
+### 6. Place Order Flow
+
+```
+User is on /checkout (protected route — must be logged in)
+       │
+       ▼
+User fills shipping form and clicks "Place Order"
+       │
+       ▼
+orderService.placeOrder(products)  — reads JWT from localStorage
+       │
+       ▼
+POST /api/orders  with header  Authorization: Bearer <token>
+       │
+       ▼
+authMiddleware verifies the JWT and sets req.user
+       │
+       ▼
+orderController validates cart, verifies each product in DB,
+recalculates totalPrice, and saves the Order (status defaults to "Pending")
+       │
+       ▼
+Response: { success: true, message: "Order placed successfully.", data: order }
+       │
+       ▼
+Frontend shows success (real order ID + total) and clears the cart
+```
+
 ---
 
 ## API Endpoints
@@ -420,6 +560,41 @@ All endpoints are served from `http://localhost:5000`.
 | POST   | `/api/products`        | Create a new product           | JSON (see below)          |
 | PUT    | `/api/products/:id`    | Update an existing product     | JSON (partial or full)    |
 | DELETE | `/api/products/:id`    | Delete a product               | —                         |
+
+### Authentication
+
+| Method | Endpoint                | Description                           | Request Body                    |
+|--------|-------------------------|---------------------------------------|---------------------------------|
+| POST   | `/api/auth/register`    | Register a new user (password hashed) | `{ name, email, password }`     |
+| POST   | `/api/auth/login`       | Login; returns a JWT token            | `{ email, password }`           |
+
+**Register** returns a success message (the user then logs in separately). **Login** returns:
+```json
+{
+  "success": true,
+  "message": "Login successful",
+  "data": {
+    "token": "<jwt-token>",
+    "user": { "id": "...", "name": "...", "email": "..." }
+  }
+}
+```
+
+### Orders (protected — require `Authorization: Bearer <token>`)
+
+| Method | Endpoint         | Description                                  | Request Body                                   |
+|--------|------------------|----------------------------------------------|------------------------------------------------|
+| POST   | `/api/orders`    | Place a new order for the logged-in user     | `{ products: [{ productId, quantity }, ...] }` |
+| GET    | `/api/orders`    | List the logged-in user's orders (newest first) | —                                           |
+
+The user ID is taken from the JWT, not the request body. The server verifies each `productId` against the database and recalculates `totalPrice`, so client-supplied prices cannot be tampered with. A successful order returns:
+```json
+{
+  "success": true,
+  "message": "Order placed successfully.",
+  "data": { "_id": "...", "user": "...", "products": [ ... ], "totalPrice": 0, "status": "Pending", "createdAt": "..." }
+}
+```
 
 ### POST/PUT Request Body Example
 
@@ -462,16 +637,21 @@ For single product:
 
 ### Backend (`backend/.env`)
 
-| Variable   | Description                          | Example                                                                   |
-|------------|--------------------------------------|---------------------------------------------------------------------------|
-| `PORT`     | Port for the Express server          | `5000`                                                                    |
-| `MONGO_URI`| MongoDB Atlas connection string      | `mongodb+srv://user:password@cluster.mongodb.net/ecommerce?retryWrites=true&w=majority` |
+| Variable         | Description                          | Example                                                                   |
+|------------------|--------------------------------------|---------------------------------------------------------------------------|
+| `PORT`           | Port for the Express server          | `5000`                                                                    |
+| `MONGO_URI`      | MongoDB Atlas connection string      | `mongodb+srv://user:password@cluster.mongodb.net/ecommerce?retryWrites=true&w=majority` |
+| `JWT_SECRET`     | Secret key used to sign JWT tokens   | `a-long-random-secret-string`                                             |
+| `JWT_EXPIRES_IN` | JWT token lifetime                   | `7d`                                                                      |
+
+`JWT_SECRET` must be set for authentication to work. Keep it private and out of version control.
 
 ### Frontend (optional)
 
-| Variable            | Description                    | Default                                  |
-|---------------------|--------------------------------|------------------------------------------|
-| `REACT_APP_API_URL` | Backend API base URL           | `http://localhost:5000/api/products`      |
+| Variable                   | Description                                   | Default                                   |
+|----------------------------|-----------------------------------------------|-------------------------------------------|
+| `REACT_APP_API_URL`        | Products API base URL                         | `http://localhost:5000/api/products`       |
+| `REACT_APP_API_BASE_URL`   | Server root for auth/order services           | `http://localhost:5000`                    |
 
 ---
 
@@ -502,9 +682,11 @@ Create or update the `.env` file:
 ```env
 PORT=5000
 MONGO_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/ecommerce?retryWrites=true&w=majority
+JWT_SECRET=<a-long-random-secret-string>
+JWT_EXPIRES_IN=7d
 ```
 
-Replace `<username>`, `<password>`, and `<cluster>` with your actual MongoDB Atlas credentials.
+Replace `<username>`, `<password>`, and `<cluster>` with your actual MongoDB Atlas credentials, and set `JWT_SECRET` to any long random string of your own.
 
 ### 3. Setup the Frontend
 
@@ -576,7 +758,8 @@ npm run build
 - Related products section (same category)
 - Breadcrumb navigation
 
-### Cart Page
+### Cart Page (protected)
+- Requires login — guests are redirected to `/login`
 - Add products from listings and detail pages
 - Increase or decrease item quantities
 - Remove individual items
@@ -587,13 +770,16 @@ npm run build
 - Login page with email and password validation
 - Signup page with full name, email, password, and confirm password
 - Client-side form validation (email format, password length, match check)
-- Auth state persisted in localStorage via AuthContext
+- **Real backend authentication** — Signup calls `POST /api/auth/register`; Login calls `POST /api/auth/login` and receives a JWT
+- JWT token and user persisted in localStorage via AuthContext
 
-### Checkout Page
+### Checkout Page (protected)
+- Requires login — guests are redirected to `/login`
 - Shipping information form
 - Payment details form
 - Form validation for phone, address, city, ZIP code
 - Order summary display
+- **Place Order** sends `POST /api/orders` with the JWT, shows loading/error states, prevents duplicate submissions, and on success displays the real order ID and clears the cart
 
 ---
 
@@ -610,31 +796,42 @@ npm run build
 
 - Provides global authentication state
 - Functions: `login`, `signup`, `logout`
-- **Persistence**: User data saved to `localStorage` under the key `"authUser"`
-- Currently uses simulated authentication (no backend API integration for auth)
+- Calls the backend auth API via `services/authService.js`
+- **Persistence**: On login, the JWT token is saved to `localStorage` under the key `"token"` and the user object under `"user"`; both are cleared on logout
+- Backed by **real JWT authentication** against `POST /api/auth/login` and `POST /api/auth/register`
+
+### orderService
+
+- `services/orderService.js` keeps order API logic out of the UI components
+- `placeOrder(products)` — sends `POST /api/orders` with the JWT in the `Authorization` header and returns the saved order
+- `getMyOrders()` — fetches the logged-in user's orders
 
 ---
 
 ## Routing
 
-| Path              | Component          | Description                |
-|-------------------|--------------------|----------------------------|
-| `/`               | Home               | Home page                  |
-| `/listings`       | ProductListings    | Product listing with filters |
-| `/listings?q=...` | ProductListings    | Filtered by search term    |
-| `/details/:id`    | ProductDetails     | Single product detail      |
-| `/cart`            | Cart               | Shopping cart               |
-| `/login`          | Login              | Login page                 |
-| `/signup`         | Signup             | Signup page                |
-| `/checkout`       | Checkout           | Checkout page              |
+| Path              | Component          | Description                          |
+|-------------------|--------------------|--------------------------------------|
+| `/`               | Home               | Home page                            |
+| `/listings`       | ProductListings    | Product listing with filters         |
+| `/listings?q=...` | ProductListings    | Filtered by search term              |
+| `/details/:id`    | ProductDetails     | Single product detail                |
+| `/cart`           | Cart               | Shopping cart (**protected** — login required) |
+| `/login`          | Login              | Login page                           |
+| `/signup`         | Signup             | Signup page                          |
+| `/checkout`       | Checkout           | Checkout page (**protected** — login required) |
+
+Protected routes are wrapped in the `ProtectedRoute` component, which checks `AuthContext`. Unauthenticated users are redirected to `/login`.
 
 ---
 
 ## Security Considerations
 
-- The `.env` file containing the MongoDB connection string is added to `.gitignore` to prevent credentials from being pushed to GitHub
+- The `.env` file containing the MongoDB connection string and `JWT_SECRET` is added to `.gitignore` to prevent secrets from being pushed to GitHub
 - CORS is configured to allow all origins (`app.use(cors())`) — for production, this should be restricted to the frontend domain only
-- Authentication is currently client-side only (simulated) — for production, a proper backend auth system with JWT or sessions would be needed
+- **Passwords are hashed with bcrypt** before being stored — plain-text passwords are never persisted
+- **Authentication uses JWT** — protected endpoints (e.g. `POST /api/orders`) require a valid token verified by `authMiddleware`; the user ID is taken from the token, never trusted from the request body
+- The JWT is stored in `localStorage`, which is convenient but vulnerable to XSS — for production, consider httpOnly cookies and short token lifetimes with refresh tokens
 
 ---
 
@@ -645,17 +842,21 @@ npm run build
 - Rating and review fields are commented out in the frontend as they are not stored in the database
 - Search and filtering are performed client-side after fetching all products from the API
 - The `strict: false` option on the Product schema allows flexible document structure in MongoDB
+- **Authentication is now real (JWT-based)** — the previous simulated/client-only auth has been replaced by `POST /api/auth/register` and `POST /api/auth/login`
+- **Orders are persisted** — placing an order on checkout saves an `Order` document via `POST /api/orders`; the server verifies products and recalculates the total rather than trusting the client
+- **Cart and Checkout are protected** — only logged-in users can reach them (via the `ProtectedRoute` component)
 
 ---
 
 ## Possible Future Enhancements
 
-- Backend authentication API (JWT-based login/signup)
+- Order history page in the UI (backend `GET /api/orders` already exists)
+- Order status updates and admin management (`Processing` → `Shipped` → `Delivered`)
 - Server-side search and filtering with pagination
 - Wishlist feature
 - Payment gateway integration
 - Admin dashboard for product management
 - Image upload functionality
-- Order history and tracking
+- Refresh tokens and httpOnly cookie storage for JWTs
 - Dark mode theme
 - Rate limiting and input sanitization on the backend
