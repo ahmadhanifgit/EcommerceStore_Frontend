@@ -207,7 +207,7 @@ EcommerceStore_Frontend/
 
 ### Overview
 
-The frontend is a **React 19** single-page application bootstrapped with **Create React App**. It uses **React Router DOM v7** for client-side navigation and renders all product data by fetching from the backend API at `http://localhost:5000/api/products`.
+The frontend is a **React 19** single-page application bootstrapped with **Create React App**. It uses **React Router DOM v7** for client-side navigation and renders all product data by fetching from the backend API, which defaults to the deployed backend at `https://ecommercestore-frontend-backend.onrender.com/api/products`.
 
 ### Key Frontend Dependencies
 
@@ -221,11 +221,11 @@ The frontend is a **React 19** single-page application bootstrapped with **Creat
 
 ### How the Frontend Fetches Data
 
-The frontend uses the native `fetch()` API to communicate with the backend. The base URL is configurable via the `REACT_APP_API_URL` environment variable, defaulting to `http://localhost:5000/api/products`.
+The frontend uses the native `fetch()` API to communicate with the backend. The base URL is configurable via the `REACT_APP_API_URL` environment variable, defaulting to the deployed backend at `https://ecommercestore-frontend-backend.onrender.com/api/products`.
 
 **ProductListings.js** — Fetches all products on mount:
 ```javascript
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api/products";
+const API_URL = process.env.REACT_APP_API_URL || "https://ecommercestore-frontend-backend.onrender.com/api/products";
 const response = await fetch(API_URL);
 const data = await response.json();
 const productList = data.data || [];   // API wraps data in { success, count, data }
@@ -401,7 +401,7 @@ User visits /listings
 ProductListings.js component mounts
        │
        ▼
-fetch("http://localhost:5000/api/products")
+fetch("https://ecommercestore-frontend-backend.onrender.com/api/products")
        │
        ▼
 Express server receives GET /api/products
@@ -540,7 +540,7 @@ Frontend shows success (real order ID + total) and clears the cart
 
 ## API Endpoints
 
-All endpoints are served from `http://localhost:5000`.
+All endpoints are served from the backend base URL — the deployed backend at `https://ecommercestore-frontend-backend.onrender.com`, or `http://localhost:5000` when running locally.
 
 ### General
 
@@ -648,10 +648,12 @@ For single product:
 
 ### Frontend (optional)
 
-| Variable                   | Description                                   | Default                                   |
-|----------------------------|-----------------------------------------------|-------------------------------------------|
-| `REACT_APP_API_URL`        | Products API base URL                         | `http://localhost:5000/api/products`       |
-| `REACT_APP_API_BASE_URL`   | Server root for auth/order services           | `http://localhost:5000`                    |
+| Variable                   | Description                                   | Default                                                          |
+|----------------------------|-----------------------------------------------|------------------------------------------------------------------|
+| `REACT_APP_API_URL`        | Products API base URL                         | `https://ecommercestore-frontend-backend.onrender.com/api/products` |
+| `REACT_APP_API_BASE_URL`   | Server root for auth/order services           | `https://ecommercestore-frontend-backend.onrender.com`           |
+
+> The defaults point to the deployed backend on Render. For local development against `http://localhost:5000`, set these variables in `frontend/.env` (e.g. `REACT_APP_API_URL=http://localhost:5000/api/products` and `REACT_APP_API_BASE_URL=http://localhost:5000`).
 
 ---
 

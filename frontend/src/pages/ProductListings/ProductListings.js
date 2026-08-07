@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import "../../styles/ProductListings.css";
 import ProductCard from "../../components/Product/ProductCard";
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api/products";
+const API_URL = process.env.REACT_APP_API_URL || "https://ecommercestore-frontend-backend.onrender.com/api/products";
 
 const ProductListings = () => {
   const [products, setProducts] = useState([]);

@@ -4,7 +4,7 @@ import ProductCard from "../../components/Product/ProductCard";
 import "../../styles/ProductDetails.css";
 import { useCart } from "../../context/CartContext";
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api/products";
+const API_BASE_URL = process.env.REACT_APP_API_URL || "https://ecommercestore-frontend-backend.onrender.com/api/products";
 
 const ProductDetails = () => {
   const { id } = useParams();

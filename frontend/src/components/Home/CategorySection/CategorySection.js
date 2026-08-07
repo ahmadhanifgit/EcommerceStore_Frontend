@@ -5,7 +5,7 @@ import ProductCard from "../../Product/ProductCard";
 import electronicsBanner from "../../../assets/images/banners/electronics-banner.jpg";
 import homeBanner from "../../../assets/images/banners/home-banner.jpg";
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api/products";
+const API_URL = process.env.REACT_APP_API_URL || "https://ecommercestore-frontend-backend.onrender.com/api/products";
 
 function CategorySection({ title, category }) {
   const [products, setProducts] = useState([]);

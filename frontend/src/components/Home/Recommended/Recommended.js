@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import "../../../styles/Recommended.css";
 import ProductCard from "../../Product/ProductCard";
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api/products";
+const API_URL = process.env.REACT_APP_API_URL || "https://ecommercestore-frontend-backend.onrender.com/api/products";
 
 function Recommended() {
   const [products, setProducts] = useState([]);

@@ -5,7 +5,7 @@
  * Components should use AuthContext (which calls this service) instead of calling these directly.
  */
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "https://ecommercestore-frontend-backend.onrender.com";
 const TOKEN_KEY = "token";
 const USER_KEY = "user";
 
