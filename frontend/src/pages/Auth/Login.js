@@ -18,6 +18,7 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const [serverError, setServerError] = useState("");
 
   // Handle input change
   const handleChange = (e) => {
@@ -33,6 +34,11 @@ function Login() {
         ...prev,
         [name]: "",
       }));
+    }
+
+    // Clear server error when user modifies any field
+    if (serverError) {
+      setServerError("");
     }
   };
 
@@ -99,9 +105,10 @@ function Login() {
     return isValid;
   };
 
-  // Handle form submission
+  // Handle form submission — calls real backend API
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setServerError("");
 
     if (!validateForm()) {
       return;
@@ -109,22 +116,21 @@ function Login() {
 
     setIsSubmitting(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      try {
-        login(formData.email, formData.password);
-        setSuccessMessage("✓ Login successful! Redirecting...");
+    try {
+      // Call backend login API via AuthContext
+      await login(formData.email, formData.password);
+      setSuccessMessage("✓ Login successful! Redirecting...");
 
-        // Redirect after 1.5 seconds
-        setTimeout(() => {
-          navigate("/");
-        }, 1500);
-      } catch (error) {
-        console.error("Login failed:", error);
-      } finally {
-        setIsSubmitting(false);
-      }
-    }, 800);
+      // Redirect to home after a brief delay
+      setTimeout(() => {
+        navigate("/");
+      }, 1500);
+    } catch (error) {
+      // Display backend error message to the user
+      setServerError(error.message || "Login failed. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Toggle password visibility
@@ -140,6 +146,10 @@ function Login() {
 
         {successMessage && (
           <div className="success-message">{successMessage}</div>
+        )}
+
+        {serverError && (
+          <div className="error-message server-error">{serverError}</div>
         )}
 
         <form onSubmit={handleSubmit} className="auth-form">

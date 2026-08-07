@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 
 const Product = require('./models/Product');
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -32,6 +33,9 @@ mongoose
 mongoose.connection.on('disconnected', () => {
   console.log('ℹ️  Mongoose disconnected from MongoDB');
 });
+
+// Auth Routes — POST /api/auth/register and POST /api/auth/login
+app.use('/api/auth', authRoutes);
 
 // Root Route
 app.get('/', (req, res) => {

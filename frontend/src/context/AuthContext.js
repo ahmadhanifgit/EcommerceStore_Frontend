@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import * as authService from "../services/authService";
 
 const AuthContext = createContext();
-const AUTH_STORAGE_KEY = "authUser";
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -17,45 +17,46 @@ function AuthProvider({ children }) {
 
   // Initialize user from localStorage on mount
   useEffect(() => {
-    const savedUser = localStorage.getItem(AUTH_STORAGE_KEY);
+    const savedUser = authService.getCurrentUser();
     if (savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch (error) {
-        console.error("Failed to parse saved user", error);
-        localStorage.removeItem(AUTH_STORAGE_KEY);
-      }
+      setUser(savedUser);
     }
     setIsLoading(false);
   }, []);
 
-  const login = (email, password) => {
-    // Simulate login - in real app, this would call an API
-    const userData = {
-      email,
-      name: email.split("@")[0],
-      loginTime: new Date().toISOString(),
-    };
-    setUser(userData);
-    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userData));
-    return userData;
+  /**
+   * Login — calls backend API, stores token + user in localStorage
+   * @param {string} email
+   * @param {string} password
+   * @returns {object} { token, user }
+   * @throws {Error} if login fails
+   */
+  const login = async (email, password) => {
+    const result = await authService.login(email, password);
+    setUser(result.user);
+    return result;
   };
 
-  const signup = (fullName, email, password) => {
-    // Simulate signup - in real app, this would call an API
-    const userData = {
-      email,
-      name: fullName,
-      signupTime: new Date().toISOString(),
-    };
-    setUser(userData);
-    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userData));
-    return userData;
+  /**
+   * Signup — calls backend API to register a new user
+   * Does NOT auto-login — user must login separately after registration
+   * @param {string} fullName
+   * @param {string} email
+   * @param {string} password
+   * @returns {object} { success, message }
+   * @throws {Error} if registration fails
+   */
+  const signup = async (fullName, email, password) => {
+    const result = await authService.register(fullName, email, password);
+    return result;
   };
 
+  /**
+   * Logout — clears token and user data from localStorage
+   */
   const logout = () => {
+    authService.logout();
     setUser(null);
-    localStorage.removeItem(AUTH_STORAGE_KEY);
   };
 
   return (

@@ -21,6 +21,7 @@ function Signup() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const [serverError, setServerError] = useState("");
 
   // Handle input change
   const handleChange = (e) => {
@@ -36,6 +37,11 @@ function Signup() {
         ...prev,
         [name]: "",
       }));
+    }
+
+    // Clear server error when user modifies any field
+    if (serverError) {
+      setServerError("");
     }
   };
 
@@ -139,9 +145,10 @@ function Signup() {
     return isValid;
   };
 
-  // Handle form submission
+  // Handle form submission — calls real backend API
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setServerError("");
 
     if (!validateForm()) {
       return;
@@ -149,22 +156,21 @@ function Signup() {
 
     setIsSubmitting(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      try {
-        signup(formData.fullName, formData.email, formData.password);
-        setSuccessMessage("✓ Account created successfully! Redirecting...");
+    try {
+      // Call backend register API via AuthContext
+      await signup(formData.fullName, formData.email, formData.password);
+      setSuccessMessage("✓ Account created successfully! Redirecting to login...");
 
-        // Redirect after 1.5 seconds
-        setTimeout(() => {
-          navigate("/");
-        }, 1500);
-      } catch (error) {
-        console.error("Signup failed:", error);
-      } finally {
-        setIsSubmitting(false);
-      }
-    }, 800);
+      // Redirect to login page after a brief delay so user can login with real credentials
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
+    } catch (error) {
+      // Display backend error message (e.g., "Email already exists")
+      setServerError(error.message || "Registration failed. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Toggle password visibility
@@ -185,6 +191,10 @@ function Signup() {
 
         {successMessage && (
           <div className="success-message">{successMessage}</div>
+        )}
+
+        {serverError && (
+          <div className="error-message server-error">{serverError}</div>
         )}
 
         <form onSubmit={handleSubmit} className="auth-form">

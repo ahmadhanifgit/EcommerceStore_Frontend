@@ -11,6 +11,7 @@ import Checkout from "./pages/Checkout/Checkout";
 
 import CartProvider from "./context/CartContext";
 import AuthProvider from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 
 import {
   Routes,
@@ -41,9 +42,14 @@ function App() {
             element={<ProductDetails />}
           />
 
+          {/* Protected Routes — require authentication */}
           <Route
             path="/cart"
-            element={<Cart />}
+            element={
+              <ProtectedRoute>
+                <Cart />
+              </ProtectedRoute>
+            }
           />
 
           <Route
@@ -58,7 +64,11 @@ function App() {
 
           <Route
             path="/checkout"
-            element={<Checkout />}
+            element={
+              <ProtectedRoute>
+                <Checkout />
+              </ProtectedRoute>
+            }
           />
 
         </Routes>
