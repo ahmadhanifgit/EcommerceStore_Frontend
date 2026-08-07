@@ -18,7 +18,7 @@ const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/ecommerce'
 // Note: browser Origin headers never include a trailing slash, so origins here must not have one.
 const allowedOrigins = [
   'https://ecommerce-store-frontend-lime.vercel.app', // deployed Vercel frontend
-  'http://localhost:3000'                             // local React dev server
+  //'http://localhost:3000'                             // local React dev server
 ];
 
 // Allow extra origins from an env var (comma-separated) without editing code.
