@@ -14,8 +14,32 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/ecommerce';
 
+// CORS — allow the deployed frontend and local development to call this API.
+// Note: browser Origin headers never include a trailing slash, so origins here must not have one.
+const allowedOrigins = [
+  'https://ecommerce-store-frontend-lime.vercel.app', // deployed Vercel frontend
+  'http://localhost:3000'                             // local React dev server
+];
+
+// Allow extra origins from an env var (comma-separated) without editing code.
+if (process.env.CORS_ORIGINS) {
+  process.env.CORS_ORIGINS.split(',').forEach((origin) => {
+    const trimmed = origin.trim();
+    if (trimmed) allowedOrigins.push(trimmed);
+  });
+}
+
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no Origin (e.g. curl, Postman, health checks) and any allowed origin.
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error(`Not allowed by CORS: ${origin}`));
+  },
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
