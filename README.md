@@ -1,47 +1,28 @@
 # Ecommerce Store — Full-Stack Web Application
 
 A complete full-stack ecommerce web application built with **React** (frontend), **Express.js** (backend), and **MongoDB Atlas** (database). The project delivers a real online shopping experience including product browsing, search and filtering, detailed product views, cart management, real JWT-based user authentication, order placement, and checkout.
+Live Deployment:
+https://vercel.com/ahmadhanif36/ecommerce-store-frontend
 
 ---
 
 ## Table of Contents
+1. [Tech Stack](#tech-stack)
+2. [Architecture Overview](#architecture-overview)
+3. [Project Structure](#project-structure)
+4. [Frontend](#frontend)
+5. [Backend](#backend)
+6. [MongoDB Atlas Database](#mongodb-atlas-database)
+7. [Data Flow — How It All Works Together](#data-flow--how-it-all-works-together)
+8. [API Endpoints](#api-endpoints)
+9. [Environment Variables](#environment-variables)
+10. [Installation and Setup](#installation-and-setup)
+11. [Running the Application](#running-the-application)
+12. [Features Breakdown](#features-breakdown)
+13. [State Management](#state-management)
+14. [Routing](#routing)
+15. [Security Considerations](#security-considerations)
 
-1. [Recent Updates](#recent-updates)
-2. [Tech Stack](#tech-stack)
-3. [Architecture Overview](#architecture-overview)
-4. [Project Structure](#project-structure)
-5. [Frontend](#frontend)
-6. [Backend](#backend)
-7. [MongoDB Atlas Database](#mongodb-atlas-database)
-8. [Data Flow — How It All Works Together](#data-flow--how-it-all-works-together)
-9. [API Endpoints](#api-endpoints)
-10. [Environment Variables](#environment-variables)
-11. [Installation and Setup](#installation-and-setup)
-12. [Running the Application](#running-the-application)
-13. [Features Breakdown](#features-breakdown)
-14. [State Management](#state-management)
-15. [Routing](#routing)
-16. [Security Considerations](#security-considerations)
-17. [Current Implementation Notes](#current-implementation-notes)
-18. [Possible Future Enhancements](#possible-future-enhancements)
-
----
-
-## Recent Updates
-
-The following features were added **this week** and extend the product/cart foundation documented previously. Authentication is now backed by a real API (it is no longer simulated), and orders are now persisted to the database.
-
-- **User model** — a Mongoose `User` schema with `name`, `email`, and `password` (bcrypt-hashed).
-- **`POST /api/auth/register`** — registers a new user and stores the password as a bcrypt hash (never plain text).
-- **`POST /api/auth/login`** — verifies credentials and returns a signed **JWT token**.
-- **JWT stored in `localStorage`** — after a successful login the frontend saves the token (key `token`) and user (key `user`) in `localStorage` and sends the token as `Authorization: Bearer <token>` on protected requests.
-- **Protected routes** — the **Cart** and **Checkout** pages are now accessible to logged-in users only; unauthenticated visitors are redirected to `/login`.
-- **Order model** — a Mongoose `Order` schema with `user`, `products`, `totalPrice`, `status`, and `createdAt`.
-- **`POST /api/orders`** — a protected endpoint that saves a new order to MongoDB when **Place Order** is clicked on the checkout page.
-
-> Sections below (Project Structure, Backend, API Endpoints, Data Flow, Security, etc.) have been updated to reflect these changes.
-
----
 
 ## Tech Stack
 
@@ -834,31 +815,3 @@ Protected routes are wrapped in the `ProtectedRoute` component, which checks `Au
 - **Passwords are hashed with bcrypt** before being stored — plain-text passwords are never persisted
 - **Authentication uses JWT** — protected endpoints (e.g. `POST /api/orders`) require a valid token verified by `authMiddleware`; the user ID is taken from the token, never trusted from the request body
 - The JWT is stored in `localStorage`, which is convenient but vulnerable to XSS — for production, consider httpOnly cookies and short token lifetimes with refresh tokens
-
----
-
-## Current Implementation Notes
-
-- Product data is fetched live from MongoDB Atlas via the backend API
-- The local `products.json` file exists but is no longer the primary data source
-- Rating and review fields are commented out in the frontend as they are not stored in the database
-- Search and filtering are performed client-side after fetching all products from the API
-- The `strict: false` option on the Product schema allows flexible document structure in MongoDB
-- **Authentication is now real (JWT-based)** — the previous simulated/client-only auth has been replaced by `POST /api/auth/register` and `POST /api/auth/login`
-- **Orders are persisted** — placing an order on checkout saves an `Order` document via `POST /api/orders`; the server verifies products and recalculates the total rather than trusting the client
-- **Cart and Checkout are protected** — only logged-in users can reach them (via the `ProtectedRoute` component)
-
----
-
-## Possible Future Enhancements
-
-- Order history page in the UI (backend `GET /api/orders` already exists)
-- Order status updates and admin management (`Processing` → `Shipped` → `Delivered`)
-- Server-side search and filtering with pagination
-- Wishlist feature
-- Payment gateway integration
-- Admin dashboard for product management
-- Image upload functionality
-- Refresh tokens and httpOnly cookie storage for JWTs
-- Dark mode theme
-- Rate limiting and input sanitization on the backend
