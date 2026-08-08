@@ -2,8 +2,7 @@
 
 A complete full-stack ecommerce web application built with **React** (frontend), **Express.js** (backend), and **MongoDB Atlas** (database). The project delivers a real online shopping experience including product browsing, search and filtering, detailed product views, cart management, real JWT-based user authentication, order placement, and checkout.
 Live Deployment:
-https://vercel.com/ahmadhanif36/ecommerce-store-frontend
-
+(https://ecommerce-store-frontend-lime.vercel.app/)
 ---
 
 ## Table of Contents
